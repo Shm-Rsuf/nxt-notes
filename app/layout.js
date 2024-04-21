@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import { getDocuments } from "@/lib/doc";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -14,7 +15,12 @@ export default function RootLayout({ children }) {
   console.log(allDocuments);
   return (
     <html lang='en'>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <div className='h-full lg:ml-72 xl:ml-80'>
+          <Header />
+          {children}
+        </div>
+      </body>
     </html>
   );
 }
