@@ -8,7 +8,7 @@ const Sidebar = ({ notes }) => {
     ({ parent }) => parent
   );
 
-  console.log({ nonRoots });
+  // console.log({ nonRoots });
 
   return (
     <nav className='lg:block my-10'>
@@ -27,6 +27,20 @@ const Sidebar = ({ notes }) => {
                 >
                   <span className='truncate'>{root.title}</span>
                 </Link>
+                {nonRoots[root.id] && (
+                  <ul role='list' className='border-l border-transparent'>
+                    {nonRoots[root.id].map((subNote) => (
+                      <li key={subNote.id}>
+                        <Link
+                          className='flex justify-between gap-2 py-1 pl-7 pr-3 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white'
+                          href={`/docs/${root.id}/${subNote.id}`}
+                        >
+                          <span className='truncate'>{subNote.title}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>
