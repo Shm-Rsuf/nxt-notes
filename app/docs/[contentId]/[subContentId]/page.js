@@ -1,5 +1,7 @@
+import ContentDisplay from "@/components/ContentDisplay";
+
 const SubContentPage = ({ params: { subContentId } }) => {
-  return <div>{subContentId}</div>;
+  return <ContentDisplay id={subContentId} />;
 };
 
 export default SubContentPage;
