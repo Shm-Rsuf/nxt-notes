@@ -1,6 +1,31 @@
+"use client";
+import {
+  getDocumentsByAuthor,
+  getDocumentsByCategory,
+  getDocumentsByTags,
+} from "@/utils/docs-utils";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 const Sidebar = ({ notes }) => {
+  const pathName = usePathname();
+  // const [state, setState] = useState();
+
+  useEffect(() => {
+    let matchNotes = notes;
+    if (pathName.includes("/tags")) {
+      const tag = pathName.split("/")[2];
+      matchNotes = getDocumentsByTags(notes, tag);
+    } else if (pathName.includes("/authors")) {
+      const authors = pathName.split("/")[2];
+      matchNotes = getDocumentsByAuthor(notes, authors);
+    } else if (pathName.includes("/categories")) {
+      const categories = pathName.split("/")[2];
+      matchNotes = getDocumentsByCategory(notes, categories);
+    }
+  }, [pathName]);
+
   const roots = notes.filter((note) => !note.parent);
   const nonRoots = Object.groupBy(
     notes.filter((note) => note.parent),
