@@ -6,11 +6,12 @@ import {
 } from "@/utils/docs-utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const Sidebar = ({ notes }) => {
   const pathName = usePathname();
-  // const [state, setState] = useState();
+  const [rootNodes, setrootNodes] = useState([]);
+  const [nonRootNodesGroup, setnonRootNodesGroup] = useState({});
 
   useEffect(() => {
     let matchNotes = notes;
@@ -24,13 +25,35 @@ const Sidebar = ({ notes }) => {
       const categories = pathName.split("/")[2];
       matchNotes = getDocumentsByCategory(notes, categories);
     }
-  }, [pathName]);
 
-  const roots = notes.filter((note) => !note.parent);
-  const nonRoots = Object.groupBy(
-    notes.filter((note) => note.parent),
-    ({ parent }) => parent
-  );
+    const roots = matchNotes.filter((note) => !note.parent);
+    const nonRoots = Object.groupBy(
+      matchNotes.filter((note) => note.parent),
+      ({ parent }) => parent
+    );
+
+    const nonRootsKeys = Reflect.ownKeys(nonRoots);
+    nonRootsKeys.forEach((key) => {
+      const foundInRoots = roots.find((root) => root.id === key);
+      if (!foundInRoots) {
+        const foundInDocs = notes.find((doc) => doc.id === key);
+        roots.push(foundInDocs);
+      }
+    });
+
+    roots.sort((a, b) => {
+      if (a.order < b.order) {
+        return -1;
+      }
+      if (a.order > b.order) {
+        return 1;
+      }
+      return 0;
+    });
+
+    setrootNodes([...roots]);
+    setnonRootNodesGroup({ ...nonRoots });
+  }, [pathName]);
 
   return (
     <nav className='lg:block my-10'>
@@ -40,7 +63,7 @@ const Sidebar = ({ notes }) => {
           <div className='absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5'></div>
           <div className='absolute left-2 h-6 w-px bg-emerald-500'></div>
           <ul role='list' className='border-l border-transparent'>
-            {roots.map((root) => (
+            {rootNodes.map((root) => (
               <li key={root.id} className='relative'>
                 <Link
                   aria-current='page'
@@ -49,9 +72,9 @@ const Sidebar = ({ notes }) => {
                 >
                   <span className='truncate'>{root.title}</span>
                 </Link>
-                {nonRoots[root.id] && (
+                {nonRootNodesGroup[root.id] && (
                   <ul role='list' className='border-l border-transparent'>
-                    {nonRoots[root.id].map((subNote) => (
+                    {nonRootNodesGroup[root.id].map((subNote) => (
                       <li key={subNote.id}>
                         <Link
                           className='flex justify-between gap-2 py-1 pl-7 pr-3 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white'
